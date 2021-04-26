@@ -8,9 +8,6 @@ const app = express()
 const port = 3000  
 
 var MongoClient = require('mongodb').MongoClient;
-
-   
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/www/'));
 
@@ -25,7 +22,11 @@ app.listen(port, () => {
 
 app.get('/', function (req, response) {
     response.sendFile(path.join(__dirname,'/index.html'));
-  });
+  
+
+   
+
+
 
   
   app.get('/login', function (req, response) {
