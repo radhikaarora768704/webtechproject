@@ -119,3 +119,67 @@ app.post('/login', function (req, response) {
             }); 
 
   });
+  app.get('/delfav', function (req, response) {
+   
+    var data = { result : "default"};
+    
+       
+            MongoClient.connect(databaseurl, {useNewUrlParser:true }, function(err, db) { 
+                if (err){
+                    response.statusCode = 404;
+                    data = { result : "Connection failed"};
+                    console.log("Connection failed");  
+                    response.send(data)
+                }else {
+                    var dbo = db.db("bakery"); 
+                    
+                    dbo.collection("favourite").deleteMany(); 
+                    
+                    response.sendFile(path.join(__dirname,'www','/index.html'));
+                                  
+
+                }
+            }); 
+
+        
+  
+  });
+  app.post('/addfavorite', function (req, response) {
+    var name=req.body.name;
+    var fav = req.body.fav;
+
+    var data = { result : "default"};
+
+      
+                MongoClient.connect(databaseurl, {useNewUrlParser:true }, function(err, db) { 
+                if (err){
+                    response.statusCode = 404;
+                    data = { result : "Unable to connect to database"};
+                    console.log("unable to connect to database");  
+                    response.send(data)
+                }
+                else 
+                {
+                    var dbo = db.db("bakery"); 
+                    var myobj = { name:name,fav:fav};  
+                    dbo.collection("favourite").insertOne(myobj, function(err, res) 
+                    {    
+                        if (err)
+                        {
+                            response.statusCode = 404;
+                            console.log("Could not Insert");    
+                            data = { result : "Could not Insert"};
+                            response.send(data)
+                        }
+                        else 
+                        {  
+                            console.log("1 document inserted");    
+                            db.close(); 
+                            response.statusCode = 200;
+                            response.sendFile(path.join(__dirname,'www','cakelist.html'));
+                            
+                        }
+                    }); 
+                }     
+            });           
+  });
