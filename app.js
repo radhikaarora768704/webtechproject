@@ -27,12 +27,13 @@ app.get('/', function (req, response) {
     response.sendFile(path.join(__dirname,'/index.html'));
   });
 
-  
+  //API for Login
   app.get('/login', function (req, response) {
     
     response.sendFile(path.join(__dirname,'www','login.html'));
   });
-
+ 
+//API for Register
   app.get('/register', function (req, response) {
     
     response.sendFile(path.join(__dirname,'www','register.html'));
@@ -119,6 +120,7 @@ app.post('/login', function (req, response) {
             }); 
 
   });
+//API for Fav
   app.get('/delfav', function (req, response) {
    
     var data = { result : "default"};
@@ -144,7 +146,9 @@ app.post('/login', function (req, response) {
         
   
   });
-  app.post('/addfavorite', function (req, response) {
+//API for add fav
+
+app.post('/addfavorite', function (req, response) {
     var name=req.body.name;
     var fav = req.body.fav;
 
@@ -159,6 +163,7 @@ app.post('/login', function (req, response) {
                     response.send(data)
                 }
                 else 
+  
                 {
                     var dbo = db.db("bakery"); 
                     var myobj = { name:name,fav:fav};  
