@@ -149,37 +149,86 @@ app.post('/login', function (req, response) {
     var fav = req.body.fav;
 
     var data = { result : "default"};
-
-      
-                MongoClient.connect(databaseurl, {useNewUrlParser:true }, function(err, db) { 
-                if (err){
+    MongoClient.connect(databaseurl, {useNewUrlParser:true }, function(err, db) { 
+        if (err){
+            response.statusCode = 404;
+            data = { result : "Unable to connect to database"};
+            console.log("unable to connect to database");  
+            response.send(data)
+        }
+        else 
+        {
+            var dbo = db.db("bakery"); 
+            var myobj = { name:name,fav:fav};  
+            dbo.collection("favourite").insertOne(myobj, function(err, res) 
+            {    
+                if (err)
+                {
                     response.statusCode = 404;
-                    data = { result : "Unable to connect to database"};
-                    console.log("unable to connect to database");  
+                    console.log("Could not Insert");    
+                    data = { result : "Could not Insert"};
                     response.send(data)
                 }
                 else 
-                {
-                    var dbo = db.db("bakery"); 
-                    var myobj = { name:name,fav:fav};  
-                    dbo.collection("favourite").insertOne(myobj, function(err, res) 
-                    {    
-                        if (err)
-                        {
+                {  
+                    console.log("1 document inserted");    
+                    db.close(); 
+                    response.statusCode = 200;
+                    response.sendFile(path.join(__dirname,'www','cakelist.html'));
+                    
+                }
+            }); 
+        }     
+    });           
+  });
+  app.post('/update', function (req, response) {
+    var name=req.body.name;
+    var email=req.body.email;
+    var phone=req.body.phone;
+    var age=req.body.age;
+    var password = req.body.password;
+
+    var data = { result : "default"};
+    //Validate 
+        if( email == ""|| name == ""){
+            response.statusCode = 404;
+            data = { result : "empty values : failed"};
+            console.log("empty values failed"); 
+            response.send(data)
+        }else {
+            MongoClient.connect(url, {useNewUrlParser:true }, function(err, db) {
+                if (err){
+                    response.statusCode = 404;
+                    data = { result : "Connection failed"};
+                    console.log("Connection failed");
+                    response.send(data)
+                }else {
+                    var dbo = db.db("bakery");
+                    var myquery = {email:email};
+                    var myobj = {$set:{ name:name, email: email, phone: phone, age: age , password: password}};  
+                    dbo.collection("userstable").updateOne(myquery, myobj, function(err, res) 
+                    {
+                        
+                        if (err){
                             response.statusCode = 404;
-                            console.log("Could not Insert");    
-                            data = { result : "Could not Insert"};
+                            console.log("user updation failed");   
+                            data = { result : "user updation failed"};
                             response.send(data)
-                        }
-                        else 
-                        {  
-                            console.log("1 document inserted");    
-                            db.close(); 
+                        }else {  
+                            console.log("1 user updated");   
+                            db.close();
                             response.statusCode = 200;
-                            response.sendFile(path.join(__dirname,'www','cakelist.html'));
-                            
+                            data = { result : "DONE"} ;
+                            response.sendFile(path.join(__dirname,'www','login.html'));
+
+                           // response.render('dashboard',{data :{email:email}});
+
                         }
-                    }); 
-                }     
-            });           
+                    });                    
+
+                }
+            }); 
+
+        }  
+           
   });
